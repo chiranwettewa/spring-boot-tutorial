@@ -1,6 +1,7 @@
 package com.chiran.Springboottutorial.service.Impl;
 
 import com.chiran.Springboottutorial.entity.Department;
+import com.chiran.Springboottutorial.error.DepartmentNotFoundException;
 import com.chiran.Springboottutorial.repository.DepartmentRepository;
 import com.chiran.Springboottutorial.service.DepartmentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,8 +25,13 @@ public class DepartmentServiceImpl implements DepartmentService {
         return departmentRepository.findAll();
     }
     @Override
-    public Department getDepartment(Long id) {
-        return departmentRepository.findById(id).get();
+    public Department getDepartment(Long id) throws DepartmentNotFoundException {
+
+        Optional<Department> department =  departmentRepository.findById(id);
+        if(!department.isPresent()){
+           throw new DepartmentNotFoundException("Department not available");
+        }
+        return department.get();
     }
 
     @Override
@@ -47,5 +53,10 @@ public class DepartmentServiceImpl implements DepartmentService {
         }
 
         return departmentRepository.save(departmentDB);
+    }
+
+    @Override
+    public Department fetchDepartmentByName(String departmentName) {
+        return departmentRepository.findByDepartmentNameIgnoreCase(departmentName);
     }
 }
